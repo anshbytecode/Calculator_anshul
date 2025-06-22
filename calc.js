@@ -1,66 +1,39 @@
+const display = document.getElementById('display');
 
+function clearDisplay() {
+  display.textContent = '0';
+}
 
-let display = document.getElementById("display");
-let buttons = document.querySelectorAll(".btn");
-let clear = document.getElementById("clear");
-let equal = document.getElementById("equal");
+function deleteLast() {
+  if (display.textContent.length === 1 || display.textContent === 'Error') {
+    display.textContent = '0';
+  } else {
+    display.textContent = display.textContent.slice(0, -1);
+  }
+}
 
-let currentInput = "";
-let operator = null;
-let previousInput = "";
+function appendNumber(number) {
+  if (display.textContent === '0' || display.textContent === 'Error') {
+    display.textContent = number;
+  } else {
+    display.textContent += number;
+  }
+}
 
-buttons.forEach(button => {
-    button.addEventListener("click", () => {
-        const value = button.getAttribute("data-value");
+function appendOperator(operator) {
+  const lastChar = display.textContent.slice(-1);
+  if ('+-*/%'.includes(lastChar)) {
+    display.textContent = display.textContent.slice(0, -1) + operator;
+  } else {
+    display.textContent += operator;
+  }
+}
 
-        if (value === "+" || value === "-" || value === "*" || value === "/") {
-            if (currentInput === "") return; // Prevent invalid operations
-            operator = value;
-            previousInput = currentInput;
-            currentInput = "";
-        } else if (value === ".") {
-            if (!currentInput.includes(".")) {
-                currentInput += value;
-            }
-        } else {
-            currentInput += value;
-        }
-
-        display.textContent = currentInput || previousInput || "0";
-    });
-});
-
-clear.addEventListener("click", () => {
-    currentInput = "";
-    previousInput = "";
-    operator = null;
-    display.textContent = "0";
-});
-
-equal.addEventListener("click", () => {
-    if (!operator || !currentInput || !previousInput) return;
-
-    let result;
-    const prev = parseFloat(previousInput);
-    const curr = parseFloat(currentInput);
-
-    switch (operator) {
-        case "+":
-            result = prev + curr;
-            break;
-        case "-":
-            result = prev - curr;
-            break;
-        case "*":
-            result = prev * curr;
-            break;
-        case "/":
-            result = prev / curr;
-            break;
-    }
-
-    display.textContent = result;
-    currentInput = result;
-    previousInput = "";
-    operator = null;
-});
+function calculateResult() {
+  try {
+    const result = eval(display.textContent.replace('×', '*').replace('÷', '/'));
+    display.textContent = Number.isFinite(result) ? result : 'Error';
+  } catch {
+    display.textContent = 'Error';
+  }
+}
